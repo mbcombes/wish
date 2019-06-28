@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>The Wishing App</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{%static 'wish/css/bootstrap.css'%}">
+    <link rel="stylesheet" type="text/css" href="{%static 'wish/css/style.css'%}">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark navbar-fixed-top">
+        <div class='container-fluid'>
+            <h1 class="navbar-brand">Hello {{request.session.username}}!</h1>
+            <a class="navbar-brand ml-auto navbar-link" href="/destroy">Logout</a>
+            <a href="/wishes/stats" class="btn btn-primary">View stats</a>
+            <a href="/wishes/new" class="btn btn-primary">Make a wish!</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h3>Your Wish List:</h3>
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Item</th>
+                    <th scope="col">Date added</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wish in user_wish %}
+                {% if wish.granted == False %}
+                <tr>
+                    <th scope="row">{{wish.item}}</th>
+                    <td>{{wish.created_at}}</td>
+                    <td><a href="/wishes/{{wish.id}}/destroy">Remove</a> | <a href="/wishes/{{wish.id}}/edit">Edit</a> |
+                        <a href="/wishes/{{wish.id}}/granted">Granted!</a>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+        <table class="table">
+            <h3>Granted wishes:</h3>
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Item</th>
+                    <th scope="col">Wisher</th>
+                    <th scope="col">Date added</th>
+                    <th scope="col">Date Granted</th>
+                    <th scope="col">Likes</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wish in granted_wishes_unliked %}
+                {% if wish.wisher.id != request.session.id %}
+                <tr>
+                    <th scope="row">{{wish.item}}</a></th>
+                    <td>{{wish.wisher.first_name}}</td>
+                    <td>{{wish.created_at}}</td>
+                    <td>{{wish.date_granted|date:'F d, Y'}}</td>
+                    <td>{{wish.likes}}</td>
+                    <td><a href="/wishes/{{wish.id}}/like">Like</a></td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                {% for wish in granted_wishes_unliked %}
+                {% if wish.wisher.id == request.session.id %}
+                <tr>
+                    <th scope="row">{{wish.item}}</a></th>
+                    <td>{{wish.wisher.first_name}}</td>
+                    <td>{{wish.created_at}}</td>
+                    <td>{{wish.date_granted|date:'F d, Y'}}</td>
+                    <td>{{wish.likes}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+
+                {% for wish in granted_wishes_liked %}
+                <tr>
+                    <th scope="row">{{wish.item}}</a></th>
+                    <td>{{wish.wisher.first_name}}</td>
+                    <td>{{wish.created_at}}</td>
+                    <td>{{wish.date_granted|date:'F d, Y'}}</td>
+                    <td>{{wish.likes}}</td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
